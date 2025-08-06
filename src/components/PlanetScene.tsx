@@ -1,42 +1,19 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stars } from "@react-three/drei";
-import { useRef } from "react";
-import { Mesh } from "three";
-import { useFrame } from "@react-three/fiber";
+import { Stars, OrbitControls } from "@react-three/drei";
+import Planet from "./Planet";
 
-function Planet() {
-  const planetRef = useRef<Mesh>(null);
-
-  // Rotate planet
-  useFrame(() => {
-    if (planetRef.current) {
-      planetRef.current.rotation.y += 0.01;
-    }
-  });
-
-  return (
-    <mesh ref={planetRef}>
-      <sphereGeometry args={[1, 32, 32]} />
-      <meshStandardMaterial color="orange" />
-    </mesh>
-  );
+interface PlanetSceneProps {
+  planet: string;
 }
 
-export default function PlanetScene() {
+export default function PlanetScene({ planet }: PlanetSceneProps) {
   return (
-    <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} />
-
-      {/* Starry background */}
-      <Stars radius={100} depth={50} count={5000} factor={4} fade />
-
-      {/* Test planet */}
-      <Planet />
-
-      {/* Orbit controls for testing */}
-      <OrbitControls enableZoom={false} />
+    <Canvas camera={{ position: [0, 0, 3], fov: 60 }} style={{ width: "100%", height: "100%" }}>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} />
+      <Stars radius={100} depth={50} count={3000} factor={4} fade />
+      <Planet texturePath={`/textures/${planet}.jpg`} />
+      <OrbitControls enableZoom={false} enablePan={false} />
     </Canvas>
   );
 }

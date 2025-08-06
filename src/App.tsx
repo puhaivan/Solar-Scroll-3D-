@@ -1,9 +1,9 @@
-import PlanetScene from "./components/PlanetScene";
+import SceneStepperScroll from "./components/scroll/SceneStepperScroll";
 
 export default function App() {
   return (
-    <div className="w-screen h-screen bg-black">
-      <PlanetScene />
+    <div className="w-screen min-h-screen bg-black">
+      <SceneStepperScroll />
     </div>
   );
 }

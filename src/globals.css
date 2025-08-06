@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100vh;
+}
+
+.panel {
+  flex: 0 0 100vw;
+  height: 100vh;
+}
+
+.arrow {
+  background-image: url("/images/arrowdown.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: black;
+}
