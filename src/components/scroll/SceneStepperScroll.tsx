@@ -16,6 +16,7 @@ export default function SceneStepperScroll() {
   ];
 
   const SCENE_WIDTH = 1400;
+  const SCROLL_MULTIPLIER = 2;
 
   useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
@@ -23,48 +24,62 @@ export default function SceneStepperScroll() {
     if (!wrapper || !container) return;
 
     const totalScenes = planets.length;
-    const totalScroll = window.innerHeight * (totalScenes - 1); // ✅ scroll space
 
+    // Set initial opacity
     gsap.set(container, { x: 0 });
     panelRefs.current.forEach((panel, i) =>
       gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
     );
 
-    const trigger = ScrollTrigger.create({
-      trigger: wrapper,
-      start: "top top",
-      end: `+=${totalScroll}`,
-      scrub: 0,
-      pin: true,
-      onUpdate: (self) => {
-        const sceneIndex = Math.floor(self.progress * (totalScenes - 0.001));
-
-        gsap.to(container, {
-          x: -sceneIndex * SCENE_WIDTH,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-
-        panelRefs.current.forEach((panel, i) => {
-          gsap.to(panel, {
-            opacity: i === sceneIndex ? 1 : 0,
-            duration: 0.5,
-            ease: "power2.out",
-          });
-        });
+    
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: wrapper,
+        start: "top top",
+        end: `+=${window.innerHeight * totalScenes * 2}`,
+        scrub: true,
+        pin: true,
       },
     });
 
-    ScrollTrigger.refresh();
-    return () => trigger.kill();
+    
+    for (let i = 0; i < totalScenes; i++) {
+      tl.to(container, {
+        x: -i * SCENE_WIDTH,
+        duration: 1,
+        ease: "power2.inOut",
+      });
+
+      tl.to(
+        panelRefs.current[i],
+        {
+          opacity: 1,
+          duration: 0.5,
+          ease: "power2.inOut",
+        },
+        "<"
+      );
+
+      if (i > 0) {
+        tl.to(
+          panelRefs.current[i - 1],
+          {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.inOut",
+          },
+          "<" 
+        );
+      }
+    }
+
+    return () => tl.scrollTrigger?.kill();
   }, [planets.length]);
 
   return (
-    <div style={{ height: `${planets.length * 100}vh` }}> {/* ✅ fake scroll */}
-      <div
-        ref={wrapperRef}
-        className="relative bg-black h-screen"
-      >
+   <div style={{ height: `${planets.length * 105 * SCROLL_MULTIPLIER}vh` }}>
+
+      <div ref={wrapperRef} className="relative bg-black h-screen">
         <div
           ref={containerRef}
           className="flex h-screen"
