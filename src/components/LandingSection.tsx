@@ -29,13 +29,7 @@ export default function HeroSection({ panelRefs }: LandingSectionProps) {
 
       <div className="z-10 max-w-3xl px-6 py-10 border-2 border-indigo-500 rounded-2xl bg-black/30 backdrop-blur-md shadow-xl">
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-wide mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)] flex items-center justify-center">
-          <img
-            src="/images/solar-logo.png"
-            alt="Solar System Logo"
-            width={100}
-            height={100}
-            className="inline-block mr-3 mt-6"
-          />
+          
           Planets Awaken
         </h1>
 
