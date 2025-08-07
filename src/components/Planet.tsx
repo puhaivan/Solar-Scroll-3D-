@@ -1,20 +1,43 @@
-import { useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
-interface PlanetProps {
-  texturePath: string;
+export interface PlanetHandle {
+  setScale: (scale: number) => void;
 }
 
-export default function Planet({ texturePath }: PlanetProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, texturePath);
+interface PlanetProps {
+  texturePath: string;
+  autoBlowUp?: boolean;
+}
 
+const Planet = forwardRef<PlanetHandle, PlanetProps>(({ texturePath }, ref) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  // Smooth scaling
+  const currentScale = useRef(0.5); // start smaller
+  const targetScale = useRef(1);    // default target
+
+  // Animate rotation + smooth scaling
   useFrame(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0015; // slow spin
+      // slow rotation
+      meshRef.current.rotation.y += 0.0015;
+
+      // smooth interpolation toward target scale
+      currentScale.current += (targetScale.current - currentScale.current) * 0.07;
+      meshRef.current.scale.setScalar(currentScale.current);
     }
   });
+
+  // Expose API for external triggers
+  useImperativeHandle(ref, () => ({
+    setScale: (scale: number) => {
+      targetScale.current = scale;
+    },
+  }));
+
+  const texture = useLoader(THREE.TextureLoader, texturePath);
 
   return (
     <mesh ref={meshRef}>
@@ -22,4 +45,6 @@ export default function Planet({ texturePath }: PlanetProps) {
       <meshStandardMaterial map={texture} />
     </mesh>
   );
-}
+});
+
+export default Planet;

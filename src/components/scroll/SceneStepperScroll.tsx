@@ -1,23 +1,44 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useMemo, createRef, useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import PlanetScene from "../PlanetScene";
+import type { PlanetHandle } from "../Planet";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const planets = [
+  "mercury", "venus", "earth", "mars",
+  "jupiter", "saturn", "uranus", "neptune"
+];
 
 export default function SceneStepperScroll() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<HTMLDivElement[]>([]);
 
-  const planets = [
-    "mercury", "venus", "earth", "mars",
-    "jupiter", "saturn", "uranus", "neptune"
-  ];
-
   const SCENE_WIDTH = 1400;
   const SCROLL_MULTIPLIER = 2;
 
+  const planetRefs = useMemo(
+    () => planets.map(() => createRef<PlanetHandle>()),
+    []
+  );
+
+  // Smooth automatic blow-up for the first planet on mount
+  useEffect(() => {
+    const firstPlanet = planetRefs[0].current;
+    if (!firstPlanet) return;
+
+    const planetObj = { scale: 0.5 };
+    gsap.to(planetObj, {
+      scale: 1,
+      duration: 3,
+      ease: "power2.out",
+      onUpdate: () => firstPlanet.setScale(planetObj.scale),
+    });
+  }, [planetRefs]);
+
+  // Scroll-triggered transitions
   useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     const container = containerRef.current;
@@ -25,60 +46,64 @@ export default function SceneStepperScroll() {
 
     const totalScenes = planets.length;
 
-    // Set initial opacity
+    // Initial state
     gsap.set(container, { x: 0 });
     panelRefs.current.forEach((panel, i) =>
       gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
     );
 
-    
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapper,
         start: "top top",
-        end: `+=${window.innerHeight * totalScenes * 2}`,
+        end: `+=${window.innerHeight * totalScenes * SCROLL_MULTIPLIER}`,
         scrub: true,
         pin: true,
       },
     });
 
-    
     for (let i = 0; i < totalScenes; i++) {
+      // Horizontal slide
       tl.to(container, {
         x: -i * SCENE_WIDTH,
-        duration: 1,
+        duration: 1.2,
         ease: "power2.inOut",
       });
 
-      tl.to(
-        panelRefs.current[i],
-        {
-          opacity: 1,
-          duration: 0.5,
-          ease: "power2.inOut",
-        },
-        "<"
-      );
-
+      // Planet scaling for all planets except the first (first animates on mount)
       if (i > 0) {
+        const planetObj = { scale: 0.5 };
         tl.to(
-          panelRefs.current[i - 1],
+          planetObj,
           {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.inOut",
+            scale: 1,
+            duration: 1.5,
+            ease: "power2.out",
+            onUpdate: () => {
+              const ref = planetRefs[i].current;
+              if (ref) ref.setScale(planetObj.scale);
+            },
+            onReverseComplete: () => {
+              const ref = planetRefs[i].current;
+              if (ref) ref.setScale(0.5);
+            },
           },
-          "<" 
+          "<"
         );
+      }
+
+      // Fade in/out panels
+      tl.to(panelRefs.current[i], { autoAlpha: 1, duration: 0.8 }, "<");
+      if (i > 0) {
+        tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, "<");
       }
     }
 
     return () => tl.scrollTrigger?.kill();
-  }, [planets.length]);
+  }, [planetRefs]);
 
   return (
-   <div style={{ height: `${planets.length * 105 * SCROLL_MULTIPLIER}vh` }}>
-
+    <div style={{ height: `${planets.length * SCROLL_MULTIPLIER * 100}vh` }}>
       <div ref={wrapperRef} className="relative bg-black h-screen">
         <div
           ref={containerRef}
@@ -98,7 +123,7 @@ export default function SceneStepperScroll() {
                 backgroundColor: "black",
               }}
             >
-              <PlanetScene planet={planet} />
+              <PlanetScene planet={planet} planetRef={planetRefs[i]} />
             </section>
           ))}
         </div>
