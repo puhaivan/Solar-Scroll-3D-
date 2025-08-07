@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef, useMemo, createRef } from "react";
+import { useLayoutEffect, useRef, useMemo, createRef, useState } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import PlanetScene from "../PlanetScene";
 import HeroSection from "../LandingSection";
+import Header from "../Header";
 import type { PlanetHandle } from "../Planet";
 import useWindowSize from "../../hooks/useWindowSize";
 
@@ -14,6 +15,7 @@ const planets = [
 ];
 
 export default function SceneStepperScroll() {
+  const [currentPlanet, setCurrentPlanet] = useState('default')
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<HTMLDivElement[]>([]);
@@ -39,13 +41,20 @@ const SCENE_WIDTH = width
     );
 
     const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrapper,
-        start: "top top",
-        end: `+=${window.innerHeight * totalScenes * SCROLL_MULTIPLIER}`,
-        scrub: true,
-        pin: true,
-      },
+  scrollTrigger: {
+    trigger: wrapper,
+    start: "top top",
+    end: `+=${window.innerHeight * totalScenes * SCROLL_MULTIPLIER}`,
+    scrub: true,
+    pin: true,
+    onUpdate: (self) => {
+      const progress = self.progress
+      const index = Math.floor(progress * (planets.length + 1))
+      if (index === 0) {
+        setCurrentPlanet('default')
+      } else {
+        setCurrentPlanet(planets[index - 1])
+    }}}
     });
 
     for (let i = 0; i < totalScenes; i++) {
@@ -85,6 +94,9 @@ tl.to(
   }, [planetRefs, SCENE_WIDTH]);
 
   return (
+    <>
+    <Header currentPlanet={currentPlanet} />
+
     <div style={{ height: `${(planets.length + 1) * SCROLL_MULTIPLIER * 100}vh` }}>
       <div ref={wrapperRef} className="relative bg-black h-screen">
         <div
@@ -112,5 +124,6 @@ tl.to(
         </div>
       </div>
     </div>
+    </>
   );
 }
