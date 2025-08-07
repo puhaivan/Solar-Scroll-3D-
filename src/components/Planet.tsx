@@ -9,28 +9,29 @@ export interface PlanetHandle {
 interface PlanetProps {
   texturePath: string;
   autoBlowUp?: boolean;
+  width: number;
 }
 
-const Planet = forwardRef<PlanetHandle, PlanetProps>(({ texturePath }, ref) => {
+const Planet = forwardRef<PlanetHandle, PlanetProps>(({ texturePath, width }, ref) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // Smooth scaling
-  const currentScale = useRef(0.5); // start smaller
-  const targetScale = useRef(1);    // default target
+ 
+  const currentScale = useRef(0.5); 
+  const targetScale = useRef(width < 768 ? 0.5 : 1)    
 
-  // Animate rotation + smooth scaling
+  
   useFrame(() => {
     if (meshRef.current) {
-      // slow rotation
+      
       meshRef.current.rotation.y += 0.0015;
 
-      // smooth interpolation toward target scale
+      
       currentScale.current += (targetScale.current - currentScale.current) * 0.07;
       meshRef.current.scale.setScalar(currentScale.current);
     }
   });
 
-  // Expose API for external triggers
+  
   useImperativeHandle(ref, () => ({
     setScale: (scale: number) => {
       targetScale.current = scale;
