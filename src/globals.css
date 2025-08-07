@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 .container {
   display: flex;
@@ -25,3 +23,34 @@ html, body {
   overflow-x: hidden;
   background: black;
 }
+
+@keyframes stars {
+  0% { background-position: 0 0; }
+  100% { background-position: -1000px 1000px; }
+}
+
+.bg-stars {
+  background-image: url("https://raw.githubusercontent.com/Klerith/professional-css/main/assets/stars.svg");
+  background-size: cover;
+  background-repeat: repeat;
+  animation: stars 200s linear infinite;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 1.2s ease-out both;
+}
+
+
+
+

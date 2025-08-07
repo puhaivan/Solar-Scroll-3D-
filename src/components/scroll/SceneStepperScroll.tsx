@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useMemo, createRef, useEffect } from "react";
+import { useLayoutEffect, useRef, useMemo, createRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import PlanetScene from "../PlanetScene";
+import HeroSection from "../LandingSection";
 import type { PlanetHandle } from "../Planet";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,29 +25,12 @@ export default function SceneStepperScroll() {
     []
   );
 
-  // Smooth automatic blow-up for the first planet on mount
-  useEffect(() => {
-    const firstPlanet = planetRefs[0].current;
-    if (!firstPlanet) return;
-
-    const planetObj = { scale: 0.5 };
-    gsap.to(planetObj, {
-      scale: 1,
-      duration: 3,
-      ease: "power2.out",
-      onUpdate: () => firstPlanet.setScale(planetObj.scale),
-    });
-  }, [planetRefs]);
-
-  // Scroll-triggered transitions
   useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     const container = containerRef.current;
     if (!wrapper || !container) return;
 
-    const totalScenes = planets.length;
-
-    // Initial state
+    const totalScenes = planets.length + 1; // +1 for intro
     gsap.set(container, { x: 0 });
     panelRefs.current.forEach((panel, i) =>
       gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
@@ -63,14 +47,13 @@ export default function SceneStepperScroll() {
     });
 
     for (let i = 0; i < totalScenes; i++) {
-      // Horizontal slide
       tl.to(container, {
         x: -i * SCENE_WIDTH,
         duration: 1.2,
         ease: "power2.inOut",
       });
 
-      // Planet scaling for all planets except the first (first animates on mount)
+      // Scale planet scenes only (skip intro at index 0)
       if (i > 0) {
         const planetObj = { scale: 0.5 };
         tl.to(
@@ -80,11 +63,11 @@ export default function SceneStepperScroll() {
             duration: 1.5,
             ease: "power2.out",
             onUpdate: () => {
-              const ref = planetRefs[i].current;
+              const ref = planetRefs[i - 1].current;
               if (ref) ref.setScale(planetObj.scale);
             },
             onReverseComplete: () => {
-              const ref = planetRefs[i].current;
+              const ref = planetRefs[i - 1].current;
               if (ref) ref.setScale(0.5);
             },
           },
@@ -92,29 +75,28 @@ export default function SceneStepperScroll() {
         );
       }
 
-      // Fade in/out panels
       tl.to(panelRefs.current[i], { autoAlpha: 1, duration: 0.8 }, "<");
-      if (i > 0) {
+      if (i > 0)
         tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, "<");
-      }
     }
 
     return () => tl.scrollTrigger?.kill();
   }, [planetRefs]);
 
   return (
-    <div style={{ height: `${planets.length * SCROLL_MULTIPLIER * 100}vh` }}>
+    <div style={{ height: `${(planets.length + 1) * SCROLL_MULTIPLIER * 100}vh` }}>
       <div ref={wrapperRef} className="relative bg-black h-screen">
         <div
           ref={containerRef}
           className="flex h-screen"
-          style={{ width: `${planets.length * SCENE_WIDTH}px` }}
+          style={{ width: `${(planets.length + 1) * SCENE_WIDTH}px` }}
         >
+          <HeroSection panelRefs={panelRefs} />
           {planets.map((planet, i) => (
             <section
               key={planet}
               ref={(el) => {
-                if (el) panelRefs.current[i] = el as HTMLDivElement;
+                if (el) panelRefs.current[i + 1] = el as HTMLDivElement;
               }}
               className="flex-shrink-0 flex items-center justify-center opacity-0"
               style={{
