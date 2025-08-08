@@ -66,7 +66,7 @@ export function useScrollTimeline({
         tl.to(
           planetObj,
           {
-            scale: sceneWidth < 768 ? 0.5 : 1,
+            scale: sceneWidth < 768 ? 0.8 : 1,
             duration: 1.5,
             ease: "power2.out",
             onUpdate: () => {

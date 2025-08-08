@@ -49,6 +49,7 @@ export default function Header({ currentPlanet }: HeaderProps) {
           </h1>
         </div>
       </header>
+      
     </>
   )
 }

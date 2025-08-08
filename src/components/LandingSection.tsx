@@ -16,6 +16,7 @@ export default function HeroSection({ panelRefs }: LandingSectionProps) {
 
   return (
     <section
+    id="hero"
       ref={sectionRef}
       className="flex-shrink-0 flex flex-col items-center justify-center text-white text-center px-6 relative overflow-hidden panel"
       style={{
