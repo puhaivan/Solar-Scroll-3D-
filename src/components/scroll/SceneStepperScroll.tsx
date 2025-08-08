@@ -24,7 +24,6 @@ export default function SceneStepperScroll({
   const { width: SCENE_WIDTH } = useWindowSize();
   const SCROLL_MULTIPLIER = 3.5;
 
-  // 🔊 Sound effect on planet change
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevPlanet = useRef(currentPlanet);
 
@@ -40,7 +39,6 @@ export default function SceneStepperScroll({
     }
   }, [currentPlanet]);
 
-  // 🛰 Scroll animation logic
   useScrollTimeline({
     wrapperRef,
     containerRef,
@@ -54,7 +52,7 @@ export default function SceneStepperScroll({
 
   return (
     <>
-      {/* 🔊 Hidden audio element */}
+      
       <audio ref={audioRef} src="/sounds/switch.mp3" preload="auto" />
 
       <div style={{ height: `${(planets.length + 1) * SCROLL_MULTIPLIER * 100}vh` }}>
@@ -78,6 +76,31 @@ export default function SceneStepperScroll({
                 currentPlanet={currentPlanet}
               />
             ))}
+            <div
+  className="flex-shrink-0 flex flex-col items-center justify-center text-white px-6"
+  style={{
+    width: `${SCENE_WIDTH}px`,
+    height: "100vh",
+    backgroundColor: "black",
+  }}
+>
+  <div className="max-w-md text-center space-y-4">
+    <h2 className="text-2xl md:text-3xl font-semibold tracking-wide text-indigo-400">
+      Thank you for exploring
+    </h2>
+    <p className="text-sm md:text-base text-white/80 leading-relaxed">
+      We hope you enjoyed this journey through our Solar System.
+      Scroll up to revisit any planet or return to the beginning.
+    </p>
+    <a
+      href="#landing"
+      className="mt-4 inline-block px-5 py-2 text-sm md:text-base font-medium rounded-lg bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 transition shadow-lg"
+    >
+      Back to Start
+    </a>
+  </div>
+</div>
+
           </div>
         </div>
       </div>
