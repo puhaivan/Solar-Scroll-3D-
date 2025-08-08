@@ -28,6 +28,7 @@ export default function PlanetSection({
   return (
     <section
       key={planet}
+      id={planet}
       ref={panelRef}
       className="flex-shrink-0 flex flex-col md:flex-row items-center justify-center opacity-0"
       style={{
