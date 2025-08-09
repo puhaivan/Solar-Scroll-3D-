@@ -33,7 +33,7 @@ export default function PlanetSection({
       className="flex-shrink-0 flex flex-col md:flex-row items-center justify-center opacity-0"
       style={{
         width: `${sceneWidth}px`,
-        height: "100vh",
+        height: "100dvh",
         backgroundColor: "black",
       }}
     >

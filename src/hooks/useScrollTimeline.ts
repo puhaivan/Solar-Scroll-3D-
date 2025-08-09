@@ -30,7 +30,8 @@ export function useScrollTimeline({
     const container = containerRef.current;
     if (!wrapper || !container) return;
 
-    const totalScenes = planets.length + 1;
+    const totalScenes = planets.length + 1; // hero + planets
+
     gsap.set(container, { x: 0 });
     panelRefs.current.forEach((panel, i) =>
       gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
@@ -40,16 +41,24 @@ export function useScrollTimeline({
       scrollTrigger: {
         trigger: wrapper,
         start: "top top",
-        end: `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
+        end: () => `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
         scrub: true,
         pin: true,
+        pinSpacing: false,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+
+        // ✨ Snap to each scene so users never stop between panels
+        snap: {
+          snapTo: 1 / (totalScenes - 1), // progress increments (0..1)
+          duration: { min: 0.2, max: 0.6 }, // how quickly it snaps
+          ease: "power1.inOut",
+          inertia: false, // avoids "coasting" on iOS
+        },
+
         onUpdate: (self) => {
           const index = Math.floor(self.progress * totalScenes);
-          if (index === 0) {
-            setCurrentPlanet("default" as PlanetName);
-          } else {
-            setCurrentPlanet(planets[index - 1] as PlanetName);
-          }
+          setCurrentPlanet(index === 0 ? ("default" as PlanetName) : (planets[index - 1] as PlanetName));
         },
       },
     });
@@ -83,11 +92,28 @@ export function useScrollTimeline({
       }
 
       tl.to(panelRefs.current[i], { autoAlpha: 1, duration: 0.8 }, "<");
-      if (i > 0) {
-        tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, "<");
-      }
+      if (i > 0) tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, "<");
     }
 
-    return () => tl.scrollTrigger?.kill();
-  }, [planetRefs, sceneWidth, setCurrentPlanet, containerRef, panelRefs, planets, scrollMultiplier, wrapperRef]);
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", refresh);
+    const onOrientation = () => setTimeout(refresh, 250);
+    window.addEventListener("orientationchange", onOrientation);
+
+    return () => {
+      window.removeEventListener("resize", refresh);
+      window.removeEventListener("orientationchange", onOrientation);
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
+  }, [
+    wrapperRef,
+    containerRef,
+    panelRefs,
+    planetRefs,
+    sceneWidth,
+    planets,
+    scrollMultiplier,
+    setCurrentPlanet,
+  ]);
 }

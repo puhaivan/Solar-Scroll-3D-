@@ -23,23 +23,38 @@ export default function SceneStepperScroll({
   const { width: SCENE_WIDTH } = useWindowSize();
   const SCROLL_MULTIPLIER = 3.5;
 
-  const [scrollHeight, setScrollHeight] = useState(
+  
+  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+  const [scrollHeight, setScrollHeight] = useState(() =>
     window.innerHeight * (planets.length + 1) * SCROLL_MULTIPLIER
   );
 
   useEffect(() => {
-    const updateHeight = () => {
-      setScrollHeight(window.innerHeight * (planets.length + 1) * SCROLL_MULTIPLIER);
+    const recalc = () => {
+      const vh = window.innerHeight;
+      setViewportHeight(vh);
+      setScrollHeight(vh * (planets.length + 1) * SCROLL_MULTIPLIER);
     };
 
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, []);
+    
+    recalc();
+    window.addEventListener("resize", recalc);
 
+    
+    const onOrientation = () => {
+      setTimeout(recalc, 250);
+    };
+    window.addEventListener("orientationchange", onOrientation);
+
+    return () => {
+      window.removeEventListener("resize", recalc);
+      window.removeEventListener("orientationchange", onOrientation);
+    };
+  }, []); 
+
+  
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevPlanet = useRef(currentPlanet);
-
   useEffect(() => {
     if (prevPlanet.current !== currentPlanet) {
       if (audioRef.current) {
@@ -68,13 +83,21 @@ export default function SceneStepperScroll({
       <audio ref={audioRef} src="/sounds/switch.mp3" preload="auto" />
 
       <div style={{ height: `${scrollHeight}px` }}>
-        <div ref={wrapperRef} className="relative bg-black h-screen">
+        <div
+          ref={wrapperRef}
+          className="relative bg-black"
+          style={{ height: `${viewportHeight}px` }} 
+        >
           <div
             ref={containerRef}
-            className="flex h-screen"
-            style={{ width: `${(planets.length + 1) * SCENE_WIDTH}px` }}
+            className="flex"
+            style={{
+              width: `${(planets.length + 1) * SCENE_WIDTH}px`,
+              height: `${viewportHeight}px`, 
+            }}
           >
             <HeroSection panelRefs={panelRefs} />
+
             {planets.map((planet, i) => (
               <PlanetSection
                 key={planet}
@@ -88,11 +111,12 @@ export default function SceneStepperScroll({
                 currentPlanet={currentPlanet}
               />
             ))}
+
             <div
               className="flex-shrink-0 flex flex-col items-center justify-center text-white px-6"
               style={{
                 width: `${SCENE_WIDTH}px`,
-                height: "100vh",
+                height: `${viewportHeight}px`,
                 backgroundColor: "black",
               }}
             >
