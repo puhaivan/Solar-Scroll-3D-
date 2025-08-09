@@ -1,38 +1,64 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
 
-   
-    <title>Planets Awaken - 3D Solar Experience</title>
+    <title>Planets Awaken — 3D Solar Experience</title>
+    <link rel="canonical" href="https://planets-awaken.com/" />
 
-    
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
 
-   
     <link rel="manifest" href="/manifest.json" />
-
-    
-    <meta name="description" content="Explore the wonders of the solar system in stunning 3D with Planets Awaken. Scroll through interactive planets, textures, and real-time transitions." />
-    <meta name="keywords" content="3D solar system, interactive planets, space exploration, Earth night mode, Saturn rings, React 3D project, GSAP scroll" />
-    <meta name="author" content="Ivan Puha" />
     <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    
-    <meta property="og:title" content="Planets Awaken" />
-    <meta property="og:description" content="Explore and interact with planets in a stunning 3D experience." />
-    <meta property="og:image" content="/images/og-preview.png" />
+    <meta
+      name="description"
+      content="Explore the solar system in a smooth 3D scroll experience. React + Three.js + GSAP with night Earth, Saturn rings, and buttery mobile performance."
+    />
+    <meta
+      name="keywords"
+      content="3D solar system, interactive planets, React Three Fiber, GSAP ScrollTrigger, space, Saturn rings, Earth night mode"
+    />
+    <meta name="author" content="Ivan Puha" />
+
+    <meta property="og:site_name" content="Planets Awaken" />
+    <meta property="og:title" content="Planets Awaken — 3D Solar Experience" />
+    <meta
+      property="og:description"
+      content="Explore and interact with planets in a stunning 3D experience."
+    />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://your-deployment-url.com" />
+    <meta property="og:url" content="https://planets-awaken.com/" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-   
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Planets Awaken" />
-    <meta name="twitter:description" content="Explore the solar system in 3D using React, Drei, and GSAP ScrollTrigger." />
-    <meta name="twitter:image" content="/images/og-preview.png" />
+    <meta name="twitter:title" content="Planets Awaken — 3D Solar Experience" />
+    <meta
+      name="twitter:description"
+      content="Explore the solar system in 3D using React, R3F, and GSAP ScrollTrigger."
+    />
+    
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"WebSite",
+      "name":"Planets Awaken",
+      "url":"https://planets-awaken.com/",
+      "description":"3D interactive solar system built with React Three Fiber and GSAP."
+    }
+    </script>
   </head>
-
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
