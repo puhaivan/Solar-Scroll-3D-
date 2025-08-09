@@ -37,31 +37,46 @@ export function useScrollTimeline({
       gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
     );
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrapper,
-        start: "top top",
-        end: () => `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
-        scrub: true,
-        pin: true,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
+    const segment = 1 / (totalScenes - 1);
 
-        // ✨ Snap to each scene so users never stop between panels
-        snap: {
-          snapTo: 1 / (totalScenes - 1), // progress increments (0..1)
-          duration: { min: 0.2, max: 0.6 }, // how quickly it snaps
-          ease: "power1.inOut",
-          inertia: false, // avoids "coasting" on iOS
-        },
+const tl = gsap.timeline({
+  scrollTrigger: {
+    trigger: wrapper,
+    start: "top top",
+    end: () => `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
+    scrub: true,
+    pin: true,
+    pinSpacing: false,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
 
-        onUpdate: (self) => {
-          const index = Math.floor(self.progress * totalScenes);
-          setCurrentPlanet(index === 0 ? ("default" as PlanetName) : (planets[index - 1] as PlanetName));
-        },
+    // ✨ Keep mid-scene snapping, but make the last scene "sticky"
+    snap: {
+      snapTo: (value) => {
+        const v = gsap.utils.clamp(0, 1, value);
+        // If you're in the last half of the final segment, force Neptune (1.0)
+        if (v >= 1 - segment * 0.5) return 1;
+        // Otherwise normal per-segment snapping
+        return gsap.utils.snap(segment)(v);
       },
-    });
+      duration: { min: 0.2, max: 0.6 },
+      ease: "power1.inOut",
+      inertia: false,
+    },
+
+    onUpdate: (self) => {
+      // Clamp to avoid index === totalScenes when progress hits 1
+      const prog = Math.min(0.999999, Math.max(0, self.progress));
+      const index = Math.floor(prog * totalScenes);
+      setCurrentPlanet(
+        index === 0
+          ? ("default" as PlanetName)
+          : (planets[index - 1] as PlanetName)
+      );
+    },
+  },
+});
+
 
     for (let i = 0; i < totalScenes; i++) {
       tl.to(container, {
