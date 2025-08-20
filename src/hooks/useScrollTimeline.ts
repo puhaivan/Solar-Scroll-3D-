@@ -31,8 +31,16 @@ export function useScrollTimeline({
     const container = containerRef.current;
     if (!wrapper || !container) return;
 
-    const getViewportHeight = () =>
-      Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    const isIOS = () =>
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    const getViewportHeight = () => {
+      if (isIOS() && window.visualViewport?.height) {
+        return Math.round(window.visualViewport.height);
+      }
+      return window.innerHeight || document.documentElement.clientHeight || 0;
+    };
 
     const totalScenes = planets.length + 1;
 
