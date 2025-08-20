@@ -76,14 +76,10 @@ export function useScrollTimeline({
         tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, '<');
     }
 
-    // Label progress positions [0..1]
     const labels = Object.entries(tl.labels)
       .sort((a, b) => a[1] - b[1])
-      .map(([, time]) => time / tl.duration()); // [0 ... 1], last is 1.0
+      .map(([, time]) => time / tl.duration());
 
-    // -------------------------------
-    // 1) Animation ScrollTrigger (NO SNAP)
-    // -------------------------------
     const stAnim = ScrollTrigger.create({
       animation: tl,
       trigger: wrapper,
@@ -105,42 +101,31 @@ export function useScrollTimeline({
       },
     });
 
-    // -------------------------------
-    // 2) Separate Snap ScrollTrigger
-    //    Early forward snap for ALL scenes before Saturn.
-    //    Saturn + Neptune = free/no-snap.
-    // -------------------------------
-
-    // indices in labels[]: ... , Saturn, Neptune(=1)
     const saturnIndex = Math.max(1, labels.length - 2);
 
-    // thresholds relative to *actual* segment length between consecutive labels
-    const FWD_T = 0.18; // snap forward once you're 18% into the *current* segment
-    const BACK_T = 0.08; // only snap back if you're within the first 8%
+    const FWD_T = 0.18;
+    const BACK_T = 0.08;
     const firstSpan = Math.max(1e-6, labels[1] - labels[0]);
-    const TOP_ALLOW_0_ABS = firstSpan * 0.9; // near top → allow snap-to-0
+    const TOP_ALLOW_0_ABS = firstSpan * 0.9;
     const prevToSaturnSpan = Math.max(
       1e-6,
       labels[saturnIndex] - labels[saturnIndex - 1]
     );
-    const SATURN_BUFFER_ABS = prevToSaturnSpan * 0.06; // tiny buffer before Saturn to avoid boundary jitter
+    const SATURN_BUFFER_ABS = prevToSaturnSpan * 0.06;
 
     ScrollTrigger.create({
       trigger: wrapper,
       start: 'top top',
       end: () => `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
-      // IMPORTANT: no scrub here — let the snap tween run
+
       snap: {
         snapTo: (raw: number): number => {
           const v = gsap.utils.clamp(0, 1, raw);
 
-          // 🚫 Disable snapping from (Saturn - buffer) onward (i.e., Saturn + Neptune are free)
           if (v >= labels[saturnIndex] - SATURN_BUFFER_ABS) return v;
 
-          // Near the very top → allow snap to 0
           if (v <= TOP_ALLOW_0_ABS) return 0;
 
-          // Find current segment i s.t. labels[i] <= v < labels[i+1], clamped before Saturn
           let i = 0;
           for (let k = 0; k < saturnIndex; k++) {
             if (v >= labels[k] && v < labels[k + 1]) {
@@ -152,29 +137,25 @@ export function useScrollTimeline({
           const start = labels[i];
           const end = labels[i + 1];
           const span = Math.max(1e-6, end - start);
-          const t = (v - start) / span; // local progress in this segment [0..1]
+          const t = (v - start) / span;
 
           const prevLabel = labels[i];
           const nextLabel = labels[i + 1];
 
-          // ⚡ Early forward snap once past FWD_T of the current segment
           if (t >= FWD_T) return nextLabel;
 
-          // ⬅️ Only snap back if you're very close to the start
           if (t <= BACK_T) return prevLabel;
 
-          // Otherwise, bias forward
           return nextLabel;
         },
-        duration: { min: 0.08, max: 0.16 }, // quick & decisive
+        duration: { min: 0.08, max: 0.16 },
         ease: 'power2.out',
-        inertia: true, // respect flick momentum
+        inertia: true,
         delay: 0,
-        directional: true, // bias to scroll direction
+        directional: true,
       },
     });
 
-    // Measure after paint (align pin spacing & ranges)
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
     });
