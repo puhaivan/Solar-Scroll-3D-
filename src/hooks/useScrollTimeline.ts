@@ -113,7 +113,6 @@ export function useScrollTimeline({
 
     // indices in labels[]: ... , Saturn, Neptune(=1)
     const saturnIndex = Math.max(1, labels.length - 2);
-    const lastIndex = labels.length - 1; // Neptune/end
 
     // thresholds relative to *actual* segment length between consecutive labels
     const FWD_T = 0.18; // snap forward once you're 18% into the *current* segment
