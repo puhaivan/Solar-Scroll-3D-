@@ -31,18 +31,7 @@ export function useScrollTimeline({
     const container = containerRef.current;
     if (!wrapper || !container) return;
 
-    const isIOS = () =>
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-    const getViewportHeight = () => {
-      if (isIOS() && window.visualViewport?.height) {
-        return Math.round(window.visualViewport.height);
-      }
-      return window.innerHeight || document.documentElement.clientHeight || 0;
-    };
-
-    const totalScenes = planets.length + 1;
+    const totalScenes = planets.length + 1; // hero + planets
 
     gsap.set(container, { x: 0 });
     panelRefs.current.forEach((panel, i) =>
@@ -51,33 +40,59 @@ export function useScrollTimeline({
 
     const segment = 1 / (totalScenes - 1);
 
+    // 🔹 capture velocity so snap can be directional
+    let currentVelocity = 0;
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapper,
         start: 'top top',
-        end: () => `+=${getViewportHeight() * totalScenes * scrollMultiplier}`,
+        end: () => `+=${window.innerHeight * totalScenes * scrollMultiplier}`,
         scrub: true,
         pin: true,
         pinSpacing: false,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        // pinType: 'transform', // uncomment if iOS still bounces
 
+        // 🔹 aggressive, scroll-driven snap (no “between scenes”)
         snap: {
           snapTo: (value: number) => {
             const v = gsap.utils.clamp(0, 1, value);
-            const snapSeg = gsap.utils.snap(segment);
-            if (v < segment * 0.15) return v;
+
+            // keep your sticky last scene
             if (v >= 1 - segment * 0.5) return 1;
-            return snapSeg(v);
+
+            const rawIndex = v / segment;
+            const nearestIndex = Math.round(rawIndex);
+            const distToNearest = Math.abs(rawIndex - nearestIndex);
+
+            // if close to a boundary, snap to nearest regardless of speed
+            if (distToNearest <= 0.25) {
+              return (
+                gsap.utils.clamp(0, totalScenes - 1, nearestIndex) * segment
+              );
+            }
+
+            // otherwise choose direction by scroll velocity
+            const goingForward = currentVelocity >= 0;
+            const targetIndex = goingForward
+              ? Math.ceil(rawIndex)
+              : Math.floor(rawIndex);
+            return gsap.utils.clamp(0, totalScenes - 1, targetIndex) * segment;
           },
-          duration: { min: 0.2, max: 0.6 },
-          ease: 'power1.inOut',
-          inertia: false,
-          directional: true,
-          delay: 0.08,
+          duration: { min: 0.06, max: 0.22 }, // fast, distance-scaled
+          ease: 'power2.out',
+          inertia: true, // respect flick momentum
+          directional: true, // only snap forward when scrolling down, etc.
+          delay: 0, // no waiting; snap immediately when gesture ends
         },
 
         onUpdate: (self) => {
+          // update velocity for snapTo
+          currentVelocity = self.getVelocity();
+
+          // your currentPlanet logic (unchanged)
           const prog = Math.min(0.999999, Math.max(0, self.progress));
           const index = Math.floor(prog * totalScenes);
           setCurrentPlanet(
@@ -122,12 +137,16 @@ export function useScrollTimeline({
         tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, '<');
     }
 
+    // 🔹 ensure overflow/pin space is measured immediately on mount
+    const initial = setTimeout(() => ScrollTrigger.refresh(), 0);
+
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('resize', refresh);
     const onOrientation = () => setTimeout(refresh, 250);
     window.addEventListener('orientationchange', onOrientation);
 
     return () => {
+      clearTimeout(initial);
       window.removeEventListener('resize', refresh);
       window.removeEventListener('orientationchange', onOrientation);
       tl.scrollTrigger?.kill();
