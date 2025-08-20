@@ -34,10 +34,12 @@ export function useScrollTimeline({
     const getViewportHeight = () =>
       Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-    const totalScenes = planets.length + 1; // hero + planets
+    const totalScenes = planets.length + 1;
 
     gsap.set(container, { x: 0 });
-    panelRefs.current.forEach((panel, i) => gsap.set(panel, { opacity: i === 0 ? 1 : 0 }));
+    panelRefs.current.forEach((panel, i) =>
+      gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
+    );
 
     const segment = 1 / (totalScenes - 1);
 
@@ -51,14 +53,13 @@ export function useScrollTimeline({
         pinSpacing: false,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        // pinType: "transform", // <— optional if iOS still bounces
 
         snap: {
           snapTo: (value: number) => {
             const v = gsap.utils.clamp(0, 1, value);
             const snapSeg = gsap.utils.snap(segment);
-            if (v < segment * 0.15) return v; // free zone at start
-            if (v >= 1 - segment * 0.5) return 1; // your sticky last scene
+            if (v < segment * 0.15) return v;
+            if (v >= 1 - segment * 0.5) return 1;
             return snapSeg(v);
           },
           duration: { min: 0.2, max: 0.6 },
@@ -72,7 +73,9 @@ export function useScrollTimeline({
           const prog = Math.min(0.999999, Math.max(0, self.progress));
           const index = Math.floor(prog * totalScenes);
           setCurrentPlanet(
-            index === 0 ? ('default' as PlanetName) : (planets[index - 1] as PlanetName)
+            index === 0
+              ? ('default' as PlanetName)
+              : (planets[index - 1] as PlanetName)
           );
         },
       },
@@ -107,7 +110,8 @@ export function useScrollTimeline({
       }
 
       tl.to(panelRefs.current[i], { autoAlpha: 1, duration: 0.8 }, '<');
-      if (i > 0) tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, '<');
+      if (i > 0)
+        tl.to(panelRefs.current[i - 1], { autoAlpha: 0, duration: 0.8 }, '<');
     }
 
     const refresh = () => ScrollTrigger.refresh();

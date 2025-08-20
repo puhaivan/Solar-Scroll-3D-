@@ -1,11 +1,11 @@
-import { useRef, useMemo, useEffect, useState, createRef } from "react";
-import { useScrollTimeline } from "../../hooks/useScrollTimeline";
-import useWindowSize from "../../hooks/useWindowSize";
-import PlanetSection from "../PlanetSection";
-import HeroSection from "../LandingSection";
-import type { PlanetHandle } from "../Planet";
-import type { PlanetName } from "../../utils/constants";
-import { planets } from "../../utils/constants";
+import { useRef, useMemo, useEffect, useState, createRef } from 'react';
+import { useScrollTimeline } from '../../hooks/useScrollTimeline';
+import useWindowSize from '../../hooks/useWindowSize';
+import PlanetSection from '../PlanetSection';
+import HeroSection from '../LandingSection';
+import type { PlanetHandle } from '../Planet';
+import type { PlanetName } from '../../utils/constants';
+import { planets } from '../../utils/constants';
 
 interface SceneStepperScrollProps {
   setCurrentPlanet: React.Dispatch<React.SetStateAction<PlanetName>>;
@@ -19,14 +19,18 @@ export default function SceneStepperScroll({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<HTMLDivElement[]>([]);
-  const planetRefs = useMemo(() => planets.map(() => createRef<PlanetHandle>()), []);
+  const planetRefs = useMemo(
+    () => planets.map(() => createRef<PlanetHandle>()),
+    []
+  );
   const { width: SCENE_WIDTH } = useWindowSize();
   const SCROLL_MULTIPLIER = 3.5;
 
-  
-  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
-  const [scrollHeight, setScrollHeight] = useState(() =>
-    window.innerHeight * (planets.length + 1) * SCROLL_MULTIPLIER
+  const [viewportHeight, setViewportHeight] = useState(
+    () => window.innerHeight
+  );
+  const [scrollHeight, setScrollHeight] = useState(
+    () => window.innerHeight * (planets.length + 1) * SCROLL_MULTIPLIER
   );
 
   useEffect(() => {
@@ -36,23 +40,20 @@ export default function SceneStepperScroll({
       setScrollHeight(vh * (planets.length + 1) * SCROLL_MULTIPLIER);
     };
 
-    
     recalc();
-    window.addEventListener("resize", recalc);
+    window.addEventListener('resize', recalc);
 
-    
     const onOrientation = () => {
       setTimeout(recalc, 250);
     };
-    window.addEventListener("orientationchange", onOrientation);
+    window.addEventListener('orientationchange', onOrientation);
 
     return () => {
-      window.removeEventListener("resize", recalc);
-      window.removeEventListener("orientationchange", onOrientation);
+      window.removeEventListener('resize', recalc);
+      window.removeEventListener('orientationchange', onOrientation);
     };
-  }, []); 
+  }, []);
 
-  
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevPlanet = useRef(currentPlanet);
   useEffect(() => {
@@ -60,7 +61,7 @@ export default function SceneStepperScroll({
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch((err) => {
-          console.warn("Autoplay blocked or failed:", err);
+          console.warn('Autoplay blocked or failed:', err);
         });
       }
       prevPlanet.current = currentPlanet;
@@ -86,14 +87,14 @@ export default function SceneStepperScroll({
         <div
           ref={wrapperRef}
           className="relative bg-black"
-          style={{ height: `${viewportHeight}px` }} 
+          style={{ height: `${viewportHeight}px` }}
         >
           <div
             ref={containerRef}
             className="flex"
             style={{
               width: `${(planets.length + 1) * SCENE_WIDTH}px`,
-              height: `${viewportHeight}px`, 
+              height: `${viewportHeight}px`,
             }}
           >
             <HeroSection panelRefs={panelRefs} />
@@ -117,7 +118,7 @@ export default function SceneStepperScroll({
               style={{
                 width: `${SCENE_WIDTH}px`,
                 height: `${viewportHeight}px`,
-                backgroundColor: "black",
+                backgroundColor: 'black',
               }}
             >
               <div className="max-w-md text-center space-y-4">

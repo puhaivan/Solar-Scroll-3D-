@@ -1,7 +1,7 @@
-import { forwardRef, useImperativeHandle, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
-import * as THREE from "three";
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useTexture } from '@react-three/drei';
+import * as THREE from 'three';
 
 export interface PlanetHandle {
   setScale: (scale: number) => void;
@@ -18,7 +18,7 @@ interface PlanetProps {
 const Planet = forwardRef<PlanetHandle, PlanetProps>(
   ({ texturePath, width, planetName, isNight }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
-    const ringRef = useRef<THREE.Mesh>(null); 
+    const ringRef = useRef<THREE.Mesh>(null);
 
     const currentScale = useRef(0.5);
     const targetScale = useRef(width < 768 ? 0.8 : 1);
@@ -31,9 +31,8 @@ const Planet = forwardRef<PlanetHandle, PlanetProps>(
         meshRef.current.scale.setScalar(currentScale.current);
       }
 
-      
       if (ringRef.current) {
-        ringRef.current.rotation.z += 0.0015; 
+        ringRef.current.rotation.z += 0.0015;
       }
     });
 
@@ -44,12 +43,12 @@ const Planet = forwardRef<PlanetHandle, PlanetProps>(
     }));
 
     const texture = useTexture(
-      planetName === "earth" && isNight
-        ? "/textures/earth-night.jpg"
+      planetName === 'earth' && isNight
+        ? '/textures/earth-night.jpg'
         : texturePath
     );
 
-    const ringTexture = useTexture("/textures/saturn-ring.png");
+    const ringTexture = useTexture('/textures/saturn-ring.png');
 
     return (
       <group key={planetName}>
@@ -60,7 +59,7 @@ const Planet = forwardRef<PlanetHandle, PlanetProps>(
         </mesh>
 
         {/* 🪐 Saturn Ring */}
-        {planetName === "saturn" && (
+        {planetName === 'saturn' && (
           <mesh
             ref={ringRef}
             rotation={[-Math.PI / 2, 0, 0]}

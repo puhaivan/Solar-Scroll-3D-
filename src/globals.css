@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 .container {
   display: flex;
@@ -12,12 +12,13 @@
 }
 
 .arrow {
-  background-image: url("/images/arrowdown.svg");
+  background-image: url('/images/arrowdown.svg');
   background-size: contain;
   background-repeat: no-repeat;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -25,12 +26,16 @@ html, body {
 }
 
 @keyframes stars {
-  0% { background-position: 0 0; }
-  100% { background-position: -1000px 1000px; }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -1000px 1000px;
+  }
 }
 
 .bg-stars {
-  background-image: url("https://raw.githubusercontent.com/Klerith/professional-css/main/assets/stars.svg");
+  background-image: url('https://raw.githubusercontent.com/Klerith/professional-css/main/assets/stars.svg');
   background-size: cover;
   background-repeat: repeat;
   animation: stars 200s linear infinite;
@@ -50,7 +55,3 @@ html, body {
 .animate-fadeInUp {
   animation: fadeInUp 1.2s ease-out both;
 }
-
-
-
-

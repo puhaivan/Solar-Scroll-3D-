@@ -1,9 +1,9 @@
-import { useState } from "react";
-import PlanetScene from "./PlanetScene";
-import PlanetDescription from "./PlanetDescription";
-import type { PlanetHandle } from "./Planet";
-import type { PlanetName } from "../utils/constants";
-import type { RefObject } from "react";
+import { useState } from 'react';
+import PlanetScene from './PlanetScene';
+import PlanetDescription from './PlanetDescription';
+import type { PlanetHandle } from './Planet';
+import type { PlanetName } from '../utils/constants';
+import type { RefObject } from 'react';
 
 interface PlanetSectionProps {
   planet: string;
@@ -23,8 +23,6 @@ export default function PlanetSection({
 }: PlanetSectionProps) {
   const [isNight, setIsNight] = useState(false);
 
-  
-
   return (
     <section
       key={planet}
@@ -33,12 +31,12 @@ export default function PlanetSection({
       className="flex-shrink-0 flex flex-col md:flex-row items-center justify-center opacity-0"
       style={{
         width: `${sceneWidth}px`,
-        height: "100dvh",
-        backgroundColor: "black",
+        height: '100dvh',
+        backgroundColor: 'black',
       }}
     >
       <div className="w-full md:w-1/2 flex justify-center items-center h-full pt-24 md:pt-0">
-        {currentPlanet !== "default" && (
+        {currentPlanet !== 'default' && (
           <PlanetDescription
             planet={currentPlanet}
             isNight={isNight}
@@ -52,7 +50,6 @@ export default function PlanetSection({
           width={sceneWidth}
           planet={planet}
           planetRef={planetRef}
-          
           isNight={isNight}
         />
       </div>

@@ -1,9 +1,6 @@
-import type {
-  PlanetName,
-  PlanetNameWithoutDefault,
-} from "../utils/constants";
-import PLANET_DESCRIPTION from "../utils/constants";
-import type { Dispatch, SetStateAction } from "react";
+import type { PlanetName, PlanetNameWithoutDefault } from '../utils/constants';
+import PLANET_DESCRIPTION from '../utils/constants';
+import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
   planet: PlanetName;
@@ -11,8 +8,12 @@ type Props = {
   setIsNight?: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function PlanetDescription({ planet, isNight, setIsNight }: Props) {
-  if (planet === "default") return null;
+export default function PlanetDescription({
+  planet,
+  isNight,
+  setIsNight,
+}: Props) {
+  if (planet === 'default') return null;
 
   const data = PLANET_DESCRIPTION[planet as PlanetNameWithoutDefault];
 
@@ -24,16 +25,20 @@ export default function PlanetDescription({ planet, isNight, setIsNight }: Props
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm text-left text-white/90">
         <div>
-          <span className="text-indigo-400 font-medium">Diameter:</span> {data.diametr} km
+          <span className="text-indigo-400 font-medium">Diameter:</span>{' '}
+          {data.diametr} km
         </div>
         <div>
-          <span className="text-indigo-400 font-medium">Moons:</span> {data.moons}
+          <span className="text-indigo-400 font-medium">Moons:</span>{' '}
+          {data.moons}
         </div>
         <div>
-          <span className="text-indigo-400 font-medium">Temperature:</span> {data.temperature}°C
+          <span className="text-indigo-400 font-medium">Temperature:</span>{' '}
+          {data.temperature}°C
         </div>
         <div>
-          <span className="text-indigo-400 font-medium">Atmosphere:</span> {data.atmosphere}
+          <span className="text-indigo-400 font-medium">Atmosphere:</span>{' '}
+          {data.atmosphere}
         </div>
       </div>
 
@@ -50,19 +55,18 @@ export default function PlanetDescription({ planet, isNight, setIsNight }: Props
         >
           Learn More
         </a>
-        </div>
+      </div>
 
-        <div className="text-center space-y-2">
-        {planet === "earth" && setIsNight && (
+      <div className="text-center space-y-2">
+        {planet === 'earth' && setIsNight && (
           <button
             onClick={() => setIsNight((prev) => !prev)}
             className="w-full md:w-auto cursor-pointer px-3 md:px-5 py-1.5 md:py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xs md:text-sm font-semibold rounded-lg transition duration-300 shadow-md hover:shadow-lg"
           >
-            {isNight ? "Switch to Day" : "Switch to Night"}
+            {isNight ? 'Switch to Day' : 'Switch to Night'}
           </button>
         )}
-        </div>
-      
+      </div>
     </div>
   );
 }
